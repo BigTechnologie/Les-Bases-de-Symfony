@@ -96,9 +96,18 @@ class MouvementColis
         return $this->commentaire;
     }
 
+    // On gère le cas ou le commentaire est une chaine vide
     public function setCommentaire(?string $commentaire): static 
     {
-        $this->commentaire = $commentaire;
+        if($commentaire === null) {
+            $this->commentaire = null;
+
+            return $this;
+        }
+
+        $commentaire = trim($commentaire);
+
+        $this->commentaire = $commentaire === '' ? null : $commentaire;
 
         return $this;
     }

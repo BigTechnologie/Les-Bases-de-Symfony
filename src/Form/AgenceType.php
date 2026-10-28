@@ -4,6 +4,8 @@ namespace App\Form;
 
 use App\Entity\Agence;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -12,11 +14,48 @@ class AgenceType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('nom')
-            ->add('codePostal')
-            ->add('ville')
-            ->add('adresse')
-            ->add('active')
+            ->add('nom', TextType::class, [
+                'label' => "Nom de l'agence",
+                'help' => "Nom officiel de l'agence",
+                'attr' => [
+                    'class' => 'form-control',
+                    'placeholder' => 'Agence de Toulouse',
+                    'maxlength' => 120,
+                    'autocomplete' => 'organization'
+                ]
+            ])
+            ->add('codePostal', TextType::class, [
+                'label' => "Code postal",
+                'attr' => [
+                    'class' => 'form-control',
+                    'placeholder' => '31000',
+                    'maxlength' => 5,
+                    'autocomplete' => 'postal-code'
+                ]
+            ])
+            ->add('ville', TextType::class, [
+                'label' => "Ville",
+                'attr' => [
+                    'class' => 'form-control',
+                    'placeholder' => 'Toulouse',
+                    'maxlength' => 80,
+                    'autocomplete' => 'address-level2'
+                ]
+            ])
+            ->add('adresse', TextType::class, [
+                'label' => "Adresse",
+                'attr' => [
+                    'class' => 'form-control',
+                    'placeholder' => '10 rue des développeurs',
+                    'maxlength' => 180,
+                    'autocomplete' => 'street-address'
+                ]
+            ])
+            ->add('active', CheckboxType::class, [
+                'label' => "Agence acitive",
+                'required' => false,
+                'help' => "Décochez cette case pour garder désactiver temporairement l'agence.",
+            ])
         ;
     }
 

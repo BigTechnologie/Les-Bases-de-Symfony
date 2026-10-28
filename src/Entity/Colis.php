@@ -7,9 +7,11 @@ use App\Repository\ColisRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ColisRepository::class)]
+#[UniqueEntity(fields: ['numeroSuivi'], message: 'Un colis utilise déjà ce numéro de suivi')]
 class Colis
 {
     #[ORM\Id]
@@ -151,7 +153,7 @@ class Colis
 
     public function setNumeroSuivi(string $numeroSuivi): static 
     {
-        $this->numeroSuivi = $numeroSuivi;
+        $this->numeroSuivi = strtoupper(trim($numeroSuivi));
 
         return $this;
     }
