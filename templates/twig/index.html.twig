@@ -1,0 +1,83 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello TwigController!{% endblock %}
+
+{% block body %}
+    <h2 class="text-center">Twig</h2>
+
+    <p>1 + 2 = {{ 1 + 2 }} </p>
+
+    <p>Bonjour {{ name }} </p>
+
+    <div class="container">
+
+        <h3>Tags: for </h3>
+
+        <ul>
+            {% for value in 1..4 %}
+                <li> {{ value }} </li>
+            {% endfor %}
+        </ul>
+
+        {% for value in [] %}
+            {{ value }}
+        {% else %}
+            <p style="color: #ffa"> Aucune valeur dans le tableau </p>
+        {% endfor %}
+
+        <dl>
+            {% for key, value in {'firstname': "John", 'lastname': "Doe"} %}
+                <dt> {{ key }} </dt>
+                <dt> {{ value }} </dt>
+            {% endfor %}
+        </dl>
+    </div>
+
+    <div class="container">
+        <h3>Tags : if</h3>
+
+        {% set temperature = 31 %}
+
+        {% if temperature > 30 %}
+            <p>Il fait très chaud</p>
+        {% elseif temperature > 20 %}
+            <p>Il fait chaud</p>
+        {% else %}
+            <p>Il fait froid</p>
+        {% endif %}
+
+        {% if name is same as "Jérôme" %}
+            <p>Bonjour {{ name }} </p>
+        {% endif %}
+    </div>
+
+    <div class="container">
+        <h3>Filtres</h3>
+
+        <p> {{ html }} </p>
+
+        <p> {{ html|raw }} </p>
+        {# com #}
+        <p> {{ date|date("d/m/Y") }} </p>
+
+        {{ "I like Twig.\nYou will like it too."|nl2br }}
+
+        <p>{{ "lundi;mardi;mercredi"|replace({';': '\n'})|nl2br }}</p>
+
+        <p> {{ 'welcome'|upper }} </p>
+    </div>
+
+    <div class="container">
+        <h3>Les fonctions</h3>
+
+        <p>url: {{ url('app_index') }} </p>
+        <p>path: {{ path('app_index') }} </p>
+
+        
+        {{ dump(date) }}
+
+        {% dump(date) %}
+        
+    </div>
+
+{% endblock %}

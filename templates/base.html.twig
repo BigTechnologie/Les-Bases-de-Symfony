@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>{% block title %}PostFlow{% endblock %}</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+        <link rel="stylesheet" href="{{ asset('css/style.css') }}"> 
+    </head>
+    <body>
+        <nav class="navbar navbar-expand-lg navbar-posteflow mb-4">
+            <div class="container">
+                <a
+                    class="navbar-brand fw-bold d-flex align-items-center gap-2"
+                    href="#"
+                >
+                    <span class="fs-4" aria-hidden="true">&#x1F4E6;</span> 
+                    <span>PosteFlow</span>
+                </a>
+
+                <button
+                    class="navbar-toggler"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#navigationPrincipale"
+                    aria-controls="navigationPrincipale"
+                    aria-expanded="false"
+                    aria-label="Afficher ou masquer la navigation"
+                >
+                    <span class="navbar-toggler-icon"></span> 
+                </button>
+
+                <div
+                    id="navigationPrincipale"
+                    class="collapse navbar-collapse"
+                >
+                    <div class="navbar-nav">
+                        <a
+                            class="nav-link"
+                            href="#"
+                        >
+                            Colis
+                        </a>
+
+                        <a
+                            class="nav-link"
+                            href="#"
+                        >
+                            Clients
+                        </a>
+
+                        <a
+                            class="nav-link"
+                            href="#"
+                        >
+                            Agences
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+        </nav>
+
+        <main class="container pb-5">
+            {% for label, messages in app.flashes %} 
+                {% for message in messages %}
+                    {% set alertClass = label in [
+                        'success',
+                        'danger',
+                        'warning',
+                        'info'
+                    ] ? label : 'info' %}
+
+                    <div
+                        class="alert alert-{{ alertClass }} alert-dismissible fade show"
+                        role="alert"
+                    >
+                        {{ message }}
+
+                        <button
+                            type="button"
+                            class="btn-close"
+                            data-bs-dismiss="alert"
+                            aria-label="Fermer"
+                        ></button>
+                    </div>
+                {% endfor %}
+            {% endfor %}
+
+            {% block body %}{% endblock %}
+        </main>
+
+        <script src="{{ asset('js/script.js') }}"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+    </body>
+</html>

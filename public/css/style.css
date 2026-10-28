@@ -1,0 +1,13 @@
+body {
+    min-height: 100vh;
+    background-color: #f6f7fb;
+}
+
+.navbar-posteflow {
+    background-color: #ffc928;
+}
+
+.card {
+    border: 0;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06);
+}
