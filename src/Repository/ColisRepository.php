@@ -7,9 +7,6 @@ use App\Enum\StatutColis;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
-/**
- * @extends ServiceEntityRepository<Colis>
- */
 class ColisRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
@@ -17,13 +14,14 @@ class ColisRepository extends ServiceEntityRepository
         parent::__construct($registry, Colis::class);
     }
 
-    // Rechercher des colis à partir de plusieurs critères facultatifs.
+    /**
+     * Recherche des colis à partir de plusieurs critères facultatifs.
+     */
     public function rechercher(
-        ?string    $terme = null,
+        ?string $terme = null,
         ?StatutColis $statut = null,
         ?string $ville = null
-    ): array
-    {
+    ): array {
         $queryBuilder = $this->createQueryBuilder('c')
             ->leftJoin('c.client', 'client')
             ->addSelect('client')
@@ -31,52 +29,66 @@ class ColisRepository extends ServiceEntityRepository
             ->addSelect('agence')
             ->orderBy('c.createdAt', 'DESC');
 
-            // Recherche textuelle
-            if($terme !== null && trim($terme) !== '') {
-                $terme = trim($terme);
+        /*
+         * Recherche textuelle dans :
+         *
+         * - le numéro de suivi ;
+         * - le nom du destinataire ;
+         * - le nom du client.
+         */
+        if ($terme !== null && trim($terme) !== '') {
+            $terme = trim($terme);
 
-                $queryBuilder
-                    ->andWhere(
-                        $queryBuilder->expr()->orX(
-                            'c.numeroSuivi LIKE :terme',
-                            'c.destinataire LIKE :terme',
-                            'c.nom LIKE :terme',
-                        )
+            $queryBuilder
+                ->andWhere( 
+                    $queryBuilder->expr()->orX( 
+                        'c.numeroSuivi LIKE :terme', 
+                        'c.destinataire LIKE :terme', 
+                        'client.nom LIKE :terme' 
                     )
-                    ->setParameter('terme', '%'.$terme.'%');
-            }
+                )
+                ->setParameter('terme', '%'.$terme.'%');
+        }
 
-            // Le paramètre est désormais un objet
-            if($statut !== null) {
-                $queryBuilder
-                    ->andWhere('c.statut = :statut')
-                    ->setParameter('statut', $statut);
-            }
+        /*
+         * Le paramètre est désormais un objet StatutColis.
+         *
+         * Exemple :
+         *
+         * StatutColis::EN_TRANSIT
+         */
+        if ($statut !== null) { 
+            $queryBuilder
+                ->andWhere('c.statut = :statut') 
+                ->setParameter('statut', $statut);
+        }
 
-            if($ville !== null && trim($ville) !== '') {
-                $ville = trim($ville);
+        if ($ville !== null && trim($ville) !== '') { 
+            $ville = trim($ville);
 
-                $queryBuilder
-                    ->andWhere('c.villeLivraison LIKE :ville')
-                    ->setParameter('ville', '%'. $ville .'%');
-            }
+            $queryBuilder
+                ->andWhere('c.villeLivraison LIKE :ville')
+                ->setParameter('ville', '%'.$ville.'%');
+        }
 
-            return $queryBuilder
-                ->getQuery()
-                ->getResult();
-    }   
+        return $queryBuilder
+            ->getQuery()
+            ->getResult();
+    }
 
-    // Permet de compter le nombre de colis pour chaque statut
     /**
+     * Compte le nombre de colis pour chaque statut.
+     *
+     * Le résultat ressemble à :
+     *
      * [
-     *  [
-     *      'statut' => 'EN_TRANSIT',
-     *      'total' => 5
-     *  ]
+     *     [
+     *         'statut' => 'EN_TRANSIT',
+     *         'total' => 5,
+     *     ],
      * ]
-    */
-
-    public function compterParStatut(): array 
+     */
+    public function compterParStatut(): array
     {
         return $this->createQueryBuilder('c')
             ->select(
@@ -89,22 +101,26 @@ class ColisRepository extends ServiceEntityRepository
             ->getArrayResult();
     }
 
-    // Retourner les derniers colis enregistrés
-    public function dernierColis(int $limit = 8): array 
+    /**
+     * Retourne les derniers colis enregistrés.
+     */
+    public function derniersColis(int $limit = 8): array
     {
         return $this->createQueryBuilder('c')
-        ->leftJoin('c.client', 'client')
-        ->addSelect('client')
-        ->leftJoin('c.agenceDepot', 'agence')
-        ->addSelect('agence')
-        ->orderBy('c.createdAt', 'DESC')
-        ->setMaxResults($limit)
-        ->getQuery()
-        ->getResult();
+            ->leftJoin('c.client', 'client')
+            ->addSelect('client')
+            ->leftJoin('c.agenceDepot', 'agence')
+            ->addSelect('agence')
+            ->orderBy('c.createdAt', 'DESC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
     }
 
-    // Permer de retourner les colis actuellement en incident et créés depuis au moins le nombre de jours demandés
-    public function colisEnIncidentDepuis(int $jours): array 
+    /**
+     * Retourne les colis actuellement en incident et créés
+     */
+    public function colisEnIncidentDepuis(int $jours): array
     {
         $jours = max(0, $jours);
 
@@ -126,42 +142,15 @@ class ColisRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    // On regroupe les informatiosn nécessaire au tableau de bord
-    public function rechercherPourTableauDeBord(): array 
+    /**
+     * Regroupe les informations nécessaires au tableau de bord.
+     */
+    public function rechercherPourTableauDeBord(): array
     {
         return [
             'parStatut' => $this->compterParStatut(),
             'incidents' => $this->colisEnIncidentDepuis(1),
-            'derniers' => $this->dernierColis()
+            'derniers' => $this->derniersColis(),
         ];
     }
-
-
-
-
-
-//    /**
-//     * @return Colis[] Returns an array of Colis objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('c')
-//            ->andWhere('c.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('c.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
-
-//    public function findOneBySomeField($value): ?Colis
-//    {
-//        return $this->createQueryBuilder('c')
-//            ->andWhere('c.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
 }

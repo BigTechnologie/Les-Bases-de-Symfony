@@ -1,0 +1,20 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h1 class="mb-1">
+                Colis {{ colis.numeroSuivi }}
+            </h1>
+
+            <span class="badge {{ colis.statut.badgeClass }} ">
+                {{ colis.statut.label }}
+            </span>
+        </div>
+
+        <div class="d-flex gap-2">
+            <a class="btn btn-outline-secondary" href=" {{ path('app_colis_index') }} ">Retour à la liste</a>
+        </div>
+
+    </div>
+{% endblock %}
